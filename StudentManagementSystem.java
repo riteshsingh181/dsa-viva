@@ -61,12 +61,14 @@ public class StudentManagementSystem {
     public void updateStudent() {
         System.out.print("Enter ID of the student to update: ");
         int id = scanner.nextInt();
+        scanner.nextLine();
         Student student = students.get(id);
         if (student != null) {
             System.out.print("Enter new Name: ");
-            student.name = scanner.next();
+            student.name = scanner.nextLine();
             System.out.print("Enter new Age: ");
             student.age = scanner.nextInt();
+            scanner.nextLine();
             System.out.print("Enter new Grade: ");
             student.grade = scanner.next();
             System.out.println("Student updated successfully.");
