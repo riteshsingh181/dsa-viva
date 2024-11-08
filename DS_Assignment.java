@@ -1,5 +1,5 @@
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 class Student {
@@ -22,94 +22,85 @@ class Student {
 }
 
 public class StudentManagementSystem {
-    private ArrayList<Student> students = new ArrayList<>();
+    private HashMap<Integer, Student> students = new HashMap<>();
     private Scanner scanner = new Scanner(System.in);
 
     // Insert a new student
     public void insertStudent() {
-        System.out.print("Enter ID: ");
-        int id = scanner.nextInt();
-        System.out.print("Enter Name: ");
-        String name = scanner.next();
-        System.out.print("Enter Age: ");
-        int age = scanner.nextInt();
-        System.out.print("Enter Grade: ");
-        String grade = scanner.next();
-        students.add(new Student(id, name, age, grade));
-        System.out.println("Student added successfully.");
-    }
+    System.out.print("Enter ID: ");
+    int id = scanner.nextInt();
+    scanner.nextLine(); // Consume the newline left by nextInt()
+
+    System.out.print("Enter Name: ");
+    String name = scanner.nextLine(); // Use nextLine() to allow spaces in the name
+
+    System.out.print("Enter Age: ");
+    int age = scanner.nextInt();
+    scanner.nextLine(); // Consume the newline left by nextInt()
+
+    System.out.print("Enter Grade: ");
+    String grade = scanner.nextLine(); // Use nextLine() for grade if it may contain spaces
+
+    students.put(id, new Student(id, name, age, grade));
+    System.out.println("Student added successfully.");
+}
+
 
     // Delete a student by ID
     public void deleteStudent() {
         System.out.print("Enter ID of the student to delete: ");
         int id = scanner.nextInt();
-        students.removeIf(student -> student.id == id);
-        System.out.println("Student deleted successfully.");
+        if (students.remove(id) != null) {
+            System.out.println("Student deleted successfully.");
+        } else {
+            System.out.println("Student not found.");
+        }
     }
 
     // Update a student by ID
     public void updateStudent() {
         System.out.print("Enter ID of the student to update: ");
         int id = scanner.nextInt();
-        for (Student student : students) {
-            if (student.id == id) {
-                System.out.print("Enter new Name: ");
-                student.name = scanner.next();
-                System.out.print("Enter new Age: ");
-                student.age = scanner.nextInt();
-                System.out.print("Enter new Grade: ");
-                student.grade = scanner.next();
-                System.out.println("Student updated successfully.");
-                return;
-            }
+        Student student = students.get(id);
+        if (student != null) {
+            System.out.print("Enter new Name: ");
+            student.name = scanner.next();
+            System.out.print("Enter new Age: ");
+            student.age = scanner.nextInt();
+            System.out.print("Enter new Grade: ");
+            student.grade = scanner.next();
+            System.out.println("Student updated successfully.");
+        } else {
+            System.out.println("Student not found.");
         }
-        System.out.println("Student not found.");
     }
 
     // Search for a student by ID
     public void searchStudent() {
         System.out.print("Enter ID of the student to search: ");
         int id = scanner.nextInt();
-        for (Student student : students) {
-            if (student.id == id) {
-                System.out.println("Student found: " + student);
-                return;
-            }
+        Student student = students.get(id);
+        if (student != null) {
+            System.out.println("Student found: " + student);
+        } else {
+            System.out.println("Student not found.");
         }
-        System.out.println("Student not found.");
     }
 
     // Display all students
     public void displayStudents() {
         System.out.println("Student List:");
-        for (Student student : students) {
-            System.out.println(student);
+        for (Map.Entry<Integer, Student> entry : students.entrySet()) {
+            System.out.println(entry.getValue());
         }
     }
 
-    // Sort students by a chosen attribute
-    public void sortStudents() {
-        System.out.print("Sort by (id/name/age/grade): ");
-        String criteria = scanner.next();
-        switch (criteria) {
-            case "id":
-                students.sort(Comparator.comparingInt(student -> student.id));
-                break;
-            case "name":
-                students.sort(Comparator.comparing(student -> student.name));
-                break;
-            case "age":
-                students.sort(Comparator.comparingInt(student -> student.age));
-                break;
-            case "grade":
-                students.sort(Comparator.comparing(student -> student.grade));
-                break;
-            default:
-                System.out.println("Invalid sort criteria.");
-                return;
-        }
-        System.out.println("Students sorted by " + criteria + ".");
-        displayStudents();
+    // Sort students by ID (since HashMap doesn't keep order, we convert to list and sort)
+    public void sortStudentsById() {
+        students.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> System.out.println(entry.getValue()));
     }
 
     // Menu-driven program
@@ -120,7 +111,7 @@ public class StudentManagementSystem {
             System.out.println("3. Update Student");
             System.out.println("4. Search Student");
             System.out.println("5. Display Students");
-            System.out.println("6. Sort Students");
+            System.out.println("6. Sort Students by ID");
             System.out.println("7. Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -141,7 +132,7 @@ public class StudentManagementSystem {
                     displayStudents();
                     break;
                 case 6:
-                    sortStudents();
+                    sortStudentsById();
                     break;
                 case 7:
                     System.out.println("Exiting...");
